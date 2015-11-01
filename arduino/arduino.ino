@@ -22,6 +22,7 @@
 
  */
 #include <stdio.h>
+#include "airmouselib.h"
 // this constant won't change.  It's the pin number
 // of the sensor's output:
 int pingPin = 7;
@@ -30,12 +31,30 @@ char *locationData;
 
 String stringDistance;
 int distance[numSensors];
+
+
 void setup() {
   // initialize serial communication:
   Serial.begin(9600);
   stringDistance="";
 }
 
+int getSmoothValue(int newValue, smoothValue old){
+    int newValue_i = old.lastValue +1;
+    if (newValue_i == averageLength) {
+       newValue_i = 0;
+    }
+
+    old.values[newValue_i] = newValue;
+
+    int average;
+    for (int i=0; i < averageLength; i++){
+        average += old.values[i];
+    }
+    return average  / averageLength;
+}
+        
+    
 void loop()
 {
   // establish variables for duration of the ping,
@@ -63,27 +82,14 @@ void loop()
     duration[i] = (duration[i]*9 +pulseIn(pingPin, HIGH)/10);
    
 
-    // convert the time into a distance
-    //distance[i] = microsecondsToCentimeters(duration[i]);
-   
    
   }
- //   locationData += cm + ":";  
 
     stringDistance += (duration[0]/4);
     stringDistance += ":";
     stringDistance += (duration[1]/4);
    
 
-   
-    //sprintf(locationData,"%d:%d",distance[0],distance[1]);  
-   
-//    int fillerSize = 16- stringDistance.length();
-//   
-//    for(int i=0;i<fillerSize;i++)
-//    {
-//      stringDistance+=":";
-//    }
     Serial.println(stringDistance);
     stringDistance ="";
    
