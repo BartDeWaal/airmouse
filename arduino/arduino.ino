@@ -38,19 +38,22 @@ void setup() {
   stringDistance="";
 }
 
-void setSmoothValue(int newValue, smoothValue old){
-    int newValue_i = old.lastValue +1;
+void setSmoothValue(int newValue, smoothValue* old){
+    
+    int newValue_i = old->lastValue +1;
     if (newValue_i == averageLength) {
        newValue_i = 0;
     }
 
-    old.values[newValue_i] = newValue;
+    old->values[newValue_i] = newValue;
+    old->lastValue =newValue_i;
 }
 
-int getSmoothValue(smoothValue old){
+int getSmoothValue(smoothValue* old){
     int average;
     for (int i=0; i < averageLength; i++){
-        average += old.values[i];
+        Serial.println(old->values[i]);
+        average += old->values[i];
     }
     return average  / averageLength;
 }
@@ -78,12 +81,12 @@ void loop()
     // pulse whose duration is the time (in microseconds) from the sending
     // of the ping to the reception of its echo off of an object.
     pinMode(pingPin, INPUT);
-    setSmoothValue(pulseIn(pingPin, HIGH), duration[i]);
+    setSmoothValue(pulseIn(pingPin, HIGH), &duration[i]);
   }
 
-    stringDistance += (getSmoothValue(duration[0])/4);
+    stringDistance += (getSmoothValue(&duration[0]));
     stringDistance += ":";
-    stringDistance += (getSmoothValue(duration[1])/4);
+    stringDistance += (getSmoothValue(&duration[1]));
    
 
     Serial.println(stringDistance);
