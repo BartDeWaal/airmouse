@@ -30,8 +30,7 @@ int pingPin = 7;
 char *locationData;
 
 String stringDistance;
-int distance[numSensors];
-
+smoothValue duration[numSensors];
 
 void setup() {
   // initialize serial communication:
@@ -39,27 +38,27 @@ void setup() {
   stringDistance="";
 }
 
-int getSmoothValue(int newValue, smoothValue old){
+void setSmoothValue(int newValue, smoothValue old){
     int newValue_i = old.lastValue +1;
     if (newValue_i == averageLength) {
        newValue_i = 0;
     }
 
     old.values[newValue_i] = newValue;
+}
 
+int getSmoothValue(smoothValue old){
     int average;
     for (int i=0; i < averageLength; i++){
         average += old.values[i];
     }
     return average  / averageLength;
 }
-        
-    
+ 
 void loop()
 {
   // establish variables for duration of the ping,
   // and the distance result in inches and centimeters:
-  long duration[numSensors];
   int inches, cm;
 
   // The PING))) is triggered by a HIGH pulse of 2 or more microseconds.
@@ -79,15 +78,12 @@ void loop()
     // pulse whose duration is the time (in microseconds) from the sending
     // of the ping to the reception of its echo off of an object.
     pinMode(pingPin, INPUT);
-    duration[i] = (duration[i]*9 +pulseIn(pingPin, HIGH)/10);
-   
-
-   
+    setSmoothValue(pulseIn(pingPin, HIGH), duration[i]);
   }
 
-    stringDistance += (duration[0]/4);
+    stringDistance += (getSmoothValue(duration[0])/4);
     stringDistance += ":";
-    stringDistance += (duration[1]/4);
+    stringDistance += (getSmoothValue(duration[1])/4);
    
 
     Serial.println(stringDistance);
