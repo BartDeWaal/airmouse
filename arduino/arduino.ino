@@ -29,7 +29,7 @@ int pingPin = 7;
 char *locationData;
 
 String stringDistance;
-int distanceCM[numSensors];
+int distance[numSensors];
 void setup() {
   // initialize serial communication:
   Serial.begin(9600);
@@ -60,31 +60,31 @@ void loop()
     // pulse whose duration is the time (in microseconds) from the sending
     // of the ping to the reception of its echo off of an object.
     pinMode(pingPin, INPUT);
-    duration[i] = pulseIn(pingPin, HIGH);
+    duration[i] = (duration[i]*9 +pulseIn(pingPin, HIGH)/10);
    
 
     // convert the time into a distance
-    distanceCM[i] = microsecondsToCentimeters(duration[i]);
+    //distance[i] = microsecondsToCentimeters(duration[i]);
    
    
   }
  //   locationData += cm + ":";  
 
-    stringDistance += distanceCM[0];
+    stringDistance += (duration[0]/4);
     stringDistance += ":";
-    stringDistance += distanceCM[1];
+    stringDistance += (duration[1]/4);
    
 
    
-    //sprintf(locationData,"%d:%d",distanceCM[0],distanceCM[1]);  
+    //sprintf(locationData,"%d:%d",distance[0],distance[1]);  
    
-    int fillerSize = 16- stringDistance.length();
-   
-    for(int i=0;i<fillerSize;i++)
-    {
-      stringDistance+=":";
-    }
-    Serial.println(stringDistance.length());
+//    int fillerSize = 16- stringDistance.length();
+//   
+//    for(int i=0;i<fillerSize;i++)
+//    {
+//      stringDistance+=":";
+//    }
+    Serial.println(stringDistance);
     stringDistance ="";
    
     delay(100);
@@ -107,4 +107,3 @@ long microsecondsToCentimeters(long microseconds)
   // object we take half of the distance travelled.
   return microseconds / 29 / 2;
 }
-
